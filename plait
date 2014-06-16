@@ -223,7 +223,7 @@ install ()
 
   if test -f plait
   then
-    sed "s:%INSTALLDIR%:$INSTALLDIR:g" plait > $INSTALLDIR/bin/plait
+    sed "s:/home/wesley:$INSTALLDIR:g" plait > $INSTALLDIR/bin/plait
     chmod +x $INSTALLDIR/bin/plait
   fi
   if test -f plait.1
@@ -611,13 +611,13 @@ translate_or_copy ()
 CYGWIN=`uname -s | grep -ic CYGWIN`
 DARWIN=`uname -s | grep -ic Darwin`
 LINUX=`uname -s | grep -ic Linux`
-INSTALLDIR="%INSTALLDIR%"
+INSTALLDIR="/home/wesley"
 
 # file types and devices
-TYPES=".mp3 .wav .flac .aif .aiff .ogg"
+TYPES=".mp3 .wav .flac .aif .aiff .ogg .m4a"
 compact="mp3 MP3"
 medium="mp3 MP3 ogg OGG wav WAV flac FLAC aif AIF aiff AIFF"
-hifi="wav WAV flac FLAC aif AIF aiff AIFF mp3 MP3 ogg OGG"
+hifi="wav WAV flac FLAC aif AIF aiff AIFF mp3 MP3 ogg OGG m4a M4A"
 DEVICE="$hifi"
 SETDEVICE=""
 
@@ -1144,6 +1144,31 @@ then
       esac
       ;;
 
+    linux-rhythmbox|unix-rhythmbox)
+      case $COMMAND in
+        play)
+          rhythmbox-client --play > /dev/null 2>&1
+          ;;
+
+        pause)
+          rhythmbox-client --pause > /dev/null 2>&1
+          ;;
+
+        stop)
+          rhythmbox-client --pause > /dev/null 2>&1
+          ;;
+
+        next)
+          rhythmbox-client --next > /dev/null 2>&1
+          ;;
+
+        prev)
+          rhythmbox-client --previous > /dev/null 2>&1
+          ;;
+
+      esac
+      ;;
+
     linux-mplayer|unix-mplayer)
       case $COMMAND in
         stop)
@@ -1408,6 +1433,27 @@ else
           amarok "$HOME/.plait/playlist2.m3u" &
         else
           amarok --enqueue "$HOME/.plait/playlist2.m3u" &
+        fi
+
+        ;;
+	
+      linux-rhythmbox|unix-rhythmbox)
+
+        prefetch_or_copy
+        if test $QUEUE = 0
+        then
+          rhythmbox-client --no-present && sleep 2
+          rhythmbox-client --clear-queue
+	  cat "$HOME/.plait/playlist2.m3u" | while read line; do
+	    rhythmbox-client --enqueue "$line"
+	  done
+	  rhythmbox-client --next
+          rhythmbox-client --play
+        else
+	  rhythmbox-client --no-present && sleep 2
+	  cat "$HOME/.plait/playlist2.m3u" | while read line; do
+	    rhythmbox-client --enqueue "$line"
+	  done
         fi
 
         ;;
