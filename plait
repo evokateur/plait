@@ -1169,6 +1169,31 @@ then
       esac
       ;;
 
+    linux-audacious|unix-audacious)
+      case $COMMAND in
+        play)
+          audacious --play > /dev/null 2>&1
+          ;;
+
+        pause)
+          audacious --pause > /dev/null 2>&1
+          ;;
+
+        stop)
+          audacious --stop > /dev/null 2>&1
+          ;;
+
+        next)
+          audacious --fwd > /dev/null 2>&1
+          ;;
+
+        prev)
+          audacious --rew > /dev/null 2>&1
+          ;;
+
+      esac
+      ;;
+
     linux-mplayer|unix-mplayer)
       case $COMMAND in
         stop)
@@ -1454,6 +1479,18 @@ else
 	  cat "$HOME/.plait/playlist2.m3u" | while read line; do
 	    rhythmbox-client --enqueue "$line"
 	  done
+        fi
+
+        ;;
+
+      linux-audacious|unix-audacious)
+
+        prefetch_or_copy
+        if test $QUEUE = 0
+        then
+          audacious --enqueue-to-temp "$HOME/.plait/playlist2.m3u" &
+        else
+          audacious --enqueue "$HOME/.plait/playlist2.m3u" &
         fi
 
         ;;
