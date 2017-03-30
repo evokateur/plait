@@ -223,7 +223,7 @@ install ()
 
   if test -f plait
   then
-    sed "s:/home/wesley:$INSTALLDIR:g" plait > $INSTALLDIR/bin/plait
+    sed "s:%INSTALLDIR%:$INSTALLDIR:g" plait > $INSTALLDIR/bin/plait
     chmod +x $INSTALLDIR/bin/plait
   fi
   if test -f plait.1
@@ -611,7 +611,7 @@ translate_or_copy ()
 CYGWIN=`uname -s | grep -ic CYGWIN`
 DARWIN=`uname -s | grep -ic Darwin`
 LINUX=`uname -s | grep -ic Linux`
-INSTALLDIR="/home/wesley"
+INSTALLDIR="%INSTALLDIR%"
 
 # file types and devices
 TYPES=".mp3 .wav .flac .aif .aiff .ogg .m4a"
