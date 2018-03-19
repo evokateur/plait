@@ -1355,7 +1355,7 @@ else
         fi
         if test $QUEUE = 0
         then
-          echo >> "$HOME/.plait/play.osa" "play track 1 of playlist \"$LISTNAME\""
+          echo >> "$HOME/.plait/play.osa" "play playlist named \"$LISTNAME\""
         fi
         echo >> "$HOME/.plait/play.osa" "end tell"
         osascript > /dev/null 2>&1 "$HOME/.plait/play.osa"
