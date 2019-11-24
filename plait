@@ -1040,7 +1040,7 @@ then
       plaiter --$COMMAND
       ;;
 
-    osx-itunes)
+    osx-itunes|mojave-itunes)
       case $COMMAND in
         play)
           osascript -e 'tell application "iTunes" to play' > /dev/null 2>&1
@@ -1349,9 +1349,47 @@ else
         else
           prefetch_stream_urls
           pl="$HOME/.plait/playlist2.m3u"
-  	  echo >> "$HOME/.plait/play.osa" "set f to \"$pl\""
-  	  echo >> "$HOME/.plait/play.osa" "set f2 to (POSIX file f) as string"
-  	  echo >> "$HOME/.plait/play.osa" "add f2 to playlist \"Pistes de plait\""
+          echo >> "$HOME/.plait/play.osa" "set f to \"$pl\""
+          echo >> "$HOME/.plait/play.osa" "set f2 to (POSIX file f) as string"
+          echo >> "$HOME/.plait/play.osa" "add f2 to playlist \"Pistes de plait\""
+        fi
+        if test $QUEUE = 0
+        then
+          echo >> "$HOME/.plait/play.osa" "play playlist named \"Pistes de plait\""
+        fi
+        echo >> "$HOME/.plait/play.osa" "end tell"
+        osascript > /dev/null 2>&1 "$HOME/.plait/play.osa"
+
+        ;;
+
+      mojave-itunes)
+
+        if test $QUEUE -eq 1
+        then
+          echo  > "$HOME/.plait/play.osa" "tell application \"iTunes\""
+          echo >> "$HOME/.plait/play.osa" "if not (exists user playlist \"Pistes de plait\") then"
+          echo >> "$HOME/.plait/play.osa" "make user playlist with properties {name:\"Pistes de plait\"}"
+          echo >> "$HOME/.plait/play.osa" "end if"
+        else
+          echo  > "$HOME/.plait/play.osa" "tell application \"iTunes\""
+          echo >> "$HOME/.plait/play.osa" "if (exists user playlist \"Pistes de plait\") then"
+          echo >> "$HOME/.plait/play.osa" "delete user playlist \"Pistes de plait\""
+          echo >> "$HOME/.plait/play.osa" "end if"
+          echo >> "$HOME/.plait/play.osa" "make user playlist with properties {name:\"Pistes de plait\"}"
+        fi
+        hasurl=`grep -ci http "$HOME/.plait/playlist.m3u"`
+        if test $hasurl = 0
+        then
+          cat "$HOME/.plait/playlist.m3u" | awk >> "$HOME/.plait/play.osa" -v pl="Pistes de plait" \
+            '{print "set f to \"" $0 "\""; \
+              print "try"; \
+              print "add f to playlist \"" pl "\"";
+              print "end try"}'
+        else
+          prefetch_stream_urls
+          pl="$HOME/.plait/playlist2.m3u"
+          echo >> "$HOME/.plait/play.osa" "set f to \"$pl\""
+          echo >> "$HOME/.plait/play.osa" "add f to playlist \"Pistes de plait\""
         fi
         if test $QUEUE = 0
         then
